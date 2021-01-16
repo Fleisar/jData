@@ -50,13 +50,16 @@ class jData {
         self::saveFile();
         return $this->AI;
     }
-    public function update(int $id, array|null $arguments = null): int|bool {
+    public function update(int|array $id, array|null $arguments = null): int|bool {
+        if(is_null($this->lastMod)) return false;
+        if(!is_int($id)) {
+            if (!is_null($this->lastMod)) $id = $this->lastMod;
+        } else $arguments = $id;
         if(sizeof($arguments)!=sizeof($this->structute)) return false;
-        if(is_null($id)&&is_null($this->lastMod)) return false;
         $map = array_map(function($item){return(int)$item["id"];},$this->data);
         $index = array_search($id,$map);
         if(is_bool($index)) return false;
-        $this->data[$index] = (object) array_merge($this->data[$index],$arguments);
+        $this->data[$index] = (object) array_merge($this->data[$index],array_combine($this->structute,$arguments));
         return $index;
     }
     public function delete(int|null $id = null): bool {
